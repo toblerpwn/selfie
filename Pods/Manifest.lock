@@ -1,0 +1,16 @@
+PODS:
+  - FlatUIKit (1.1)
+  - MBProgressHUD (0.6)
+  - UIColor+MLPFlatColors (1.0)
+
+DEPENDENCIES:
+  - FlatUIKit (~> 1.1)
+  - MBProgressHUD (= 0.6)
+  - UIColor+MLPFlatColors (= 1.0)
+
+SPEC CHECKSUMS:
+  FlatUIKit: 3b15b582ffcfa4e392bedc4d3c5461f9b11c1cc2
+  MBProgressHUD: 9b55a90566fb5d07df0602f6fd9fa04510ad5d52
+  UIColor+MLPFlatColors: 8631d7f050b0e5afd9af178a60319891c5113d0e
+
+COCOAPODS: 0.19.1

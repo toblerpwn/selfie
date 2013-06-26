@@ -14,7 +14,9 @@
 
 @interface SLFSelfieViewController ()
 
-@property UIView *cameraView;
+@property SLFCameraView *cameraView;
+
+- (void)_viewWasTapped:(UITapGestureRecognizer *)tapRecognizer;
 
 @end
 
@@ -36,23 +38,43 @@
     
     self.view.backgroundColor = [UIColor cloudsColor];
     
+    // add camera prview
     self.cameraView = [[SLFCameraView alloc] initWithFrame:self.view.bounds];
-    
     [self.view addSubview:self.cameraView];
+    
+    // add tap recognizer
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                                    action:@selector(_viewWasTapped:)];
+    
+    [self.view addGestureRecognizer:tapRecognizer];
     
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     
-    BOOL albumCreated = [[SLFAssetManager sharedManager] authorizationStatus];
-    
-    
+    // check for asset group (album) & act accordingly
     
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Private Methods
+
+- (void)_viewWasTapped:(UITapGestureRecognizer *)tapRecognizer {
+    
+    [self.cameraView captureStillImageWithCompletion:^(UIImage *image) {
+        
+        if (image) {
+            
+        } else {
+            SLFWarning(@"No image returned from live camera.");
+        }
+        
+    }];
+    
 }
 
 @end

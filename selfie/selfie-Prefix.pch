@@ -20,9 +20,13 @@
  Logging Functions
  */
 #ifdef DEBUG
+#define SLFError(...) NSLog(__VA_ARGS__)
+#define SLFWarning(...) NSLog(__VA_ARGS__)
 #define SLFLog(...) NSLog(__VA_ARGS__)
 #define NSLog(__FORMAT__, ...) NSLog((@"%s\n - " __FORMAT__), __PRETTY_FUNCTION__, ##__VA_ARGS__)
 #else
+#define SLFError(...) NSLog(__VA_ARGS__)
+#define SLFWarning(...) NSLog(__VA_ARGS__)
 #define SLFLog(...)
 #endif
 

@@ -16,6 +16,7 @@
 
 @property AVCaptureVideoPreviewLayer *cameraPreviewLayer;
 @property AVCaptureStillImageOutput *liveCameraImageOutput;
+@property BOOL liveCameraIsFrontFacingCamera;
 
 @end
 
@@ -47,12 +48,8 @@
             }
         }
         
-        AVCaptureDevice *bestCamera;
-        if (frontCamera) {
-            bestCamera = frontCamera;
-        } else if (backCamera) {
-            bestCamera = backCamera;
-        }
+        AVCaptureDevice *bestCamera = (frontCamera) ? frontCamera : backCamera;
+        self.liveCameraIsFrontFacingCamera = (bestCamera == frontCamera) ? YES : NO;
         
         if (bestCamera) {
             // make session
@@ -73,7 +70,7 @@
             
             [session addOutput:self.liveCameraImageOutput];
             
-            // set the videoMirrored property for later useconnections);
+            // set the videoMirrored property for later use
             AVCaptureConnection *connection = [self.liveCameraImageOutput.connections lastObject];
             connection.videoMirrored = (bestCamera == frontCamera) ? YES : NO;
             
@@ -83,7 +80,7 @@
                                                                                      error:&error];
             
             if (error) {
-                SLFLog(@"error: %@",error);
+                SLFWarning(@"error: %@",error);
             }
             
             [session addInput:videoInput];
@@ -96,15 +93,75 @@
             
             [session startRunning];
             
-            
         } else { // no camera found!
-            SLFLog(@"No camera found; cannot add live camera preview!");
+            SLFError(@"No camera found; cannot add live camera preview!");
         }
         
     }
     return self;
 }
 
-#pragma mark - Private Methods
+#pragma mark - Public Methods
+
+- (void)captureStillImageWithCompletion:(void (^)(UIImage *))completionBlock {
+    
+    // TODO: handle devices that don't have the hardware we're expecting
+    AVCaptureConnection *videoConnection = nil;
+    AVCaptureStillImageOutput *stillImageCapture = self.liveCameraImageOutput;
+    for (AVCaptureConnection *connection in stillImageCapture.connections)
+    {
+        for (AVCaptureInputPort *port in [connection inputPorts])
+        {
+            if ([[port mediaType] isEqual:AVMediaTypeVideo] )
+            {
+                videoConnection = connection;
+                break;
+            }
+        }
+        if (videoConnection) {
+            break;
+        }
+    }
+    
+    if (videoConnection) {
+        
+        [stillImageCapture captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler: ^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+            
+            if (!error) {
+                
+                NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+                UIImage *image = [UIImage imageWithData:imageData];
+                
+                // if camera is front, flip image - benchmarked flip @ 0.05 seconds on iPhone 4S
+                if (self.liveCameraIsFrontFacingCamera) {
+                    image = [UIImage imageWithCGImage:image.CGImage
+                                                scale:1.0
+                                          orientation:UIImageOrientationLeftMirrored];
+                    imageData = UIImageJPEGRepresentation(image,
+                                                          0.8);
+                    
+                }
+                
+                // now send completion callback if it exists
+                if (completionBlock) {
+                    completionBlock(image);
+                }
+                
+            } else {
+                SLFError(@"error capturing image: %@",error);
+                if (completionBlock) {
+                    completionBlock(nil);
+                }
+            }
+            
+        }];
+    } else {
+        SLFError(@"no video connection! unable to capture still image.");
+        if (completionBlock) {
+            completionBlock(nil);
+        }
+    }
+    
+}
 
 @end

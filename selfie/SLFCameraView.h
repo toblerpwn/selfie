@@ -10,4 +10,6 @@
 
 @interface SLFCameraView : UIView
 
+- (void)captureStillImageWithCompletion:(void (^)(UIImage *image))completionBlock;
+
 @end

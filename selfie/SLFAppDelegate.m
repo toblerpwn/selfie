@@ -7,6 +7,7 @@
 //
 
 #import "SLFAppDelegate.h"
+#import "SLFSelfieViewController.h"
 
 @implementation SLFAppDelegate
 
@@ -14,6 +15,11 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    
+    SLFSelfieViewController *photoController = [[SLFSelfieViewController alloc] initWithNibName:nil bundle:nil];
+    
+    self.window.rootViewController = photoController;
+    
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;

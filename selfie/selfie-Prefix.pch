@@ -12,3 +12,20 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
 #endif
+
+#import <FlatUIKit/UIColor+FlatUI.h> // http://flatuicolors.com
+
+////////////////////////////////////////////////////////////////////////////////
+/**
+ Logging Functions
+ */
+#ifdef DEBUG
+#define SLFLog(...) NSLog(__VA_ARGS__)
+#define NSLog(__FORMAT__, ...) NSLog((@"%s\n - " __FORMAT__), __PRETTY_FUNCTION__, ##__VA_ARGS__)
+#else
+#define SLFLog(...)
+#endif
+
+//#define EALog(...) // disables all logging when un-commented (shows more real-world UI performance)
+
+////////////////////////////////////////////////////////////////////////////////
